@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TaskManegementSystem.Migrations
 {
-    public partial class TaskManegement : Migration
+    public partial class Migration1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

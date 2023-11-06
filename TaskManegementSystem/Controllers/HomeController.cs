@@ -18,6 +18,11 @@ namespace TaskManegementSystem.Controllers
             return View();
         }
 
+      
+        public IActionResult CreateTask()
+        {
+            return View();
+        }
         public IActionResult Privacy()
         {
             return View();

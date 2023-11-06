@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TaskManegementSystem.Areas.Identity.Data;
+using TaskManegementSystem.Models;
+
 
 namespace TaskManegementSystem.Data;
 
@@ -13,6 +15,8 @@ public class TaskManegementDbContext : IdentityDbContext<TaskManegementSystemUse
     {
     }
 
+    public DbSet<TaskViewModel> Tasks { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -20,6 +24,8 @@ public class TaskManegementDbContext : IdentityDbContext<TaskManegementSystemUse
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
         builder.ApplyConfiguration(new ApplicationUserIdentityConfiguration());
+
+
     }
     public class ApplicationUserIdentityConfiguration: IEntityTypeConfiguration<TaskManegementSystemUser>
     {
@@ -31,4 +37,6 @@ public class TaskManegementDbContext : IdentityDbContext<TaskManegementSystemUse
             builder.Property(u => u.LastName).HasMaxLength(250);
         }
     }
+
+   
 }

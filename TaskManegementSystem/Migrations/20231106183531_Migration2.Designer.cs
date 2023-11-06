@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManegementSystem.Data;
 
@@ -11,9 +12,10 @@ using TaskManegementSystem.Data;
 namespace TaskManegementSystem.Migrations
 {
     [DbContext(typeof(TaskManegementDbContext))]
-    partial class TaskManegementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231106183531_Migration2")]
+    partial class Migration2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -243,6 +245,7 @@ namespace TaskManegementSystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskID"), 1L, 1);
 
                     b.Property<string>("AssignedUser")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")

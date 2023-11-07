@@ -1,8 +1,30 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model IEnumerable<TaskViewModel>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<link rel="stylesheet" type="text/css" href="~/css/site.css" />
+
+<h1 class="text-center">Dashboard</h1>
+
+<div class="table-responsive">
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Assigned User</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model)
+            {
+                <tr>
+                    <td>@task.TaskID</td>
+                    <td>@task.Name</td>
+                    <td>@task.Description</td>
+                    <td>@task.AssignedUser</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
+

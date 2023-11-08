@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TaskManegementSystem.Areas.Identity.Data;
 using TaskManegementSystem.Data;
 using TaskManegementSystem.Models;
 
@@ -14,12 +17,15 @@ namespace TaskManegementSystem.Controllers
     {
         private readonly TaskManegementDbContext _context;
 
-        public TaskController(TaskManegementDbContext context)
+        private readonly UserManager<TaskManegementSystemUser> _userManager;
+
+        public TaskController(TaskManegementDbContext context, UserManager<TaskManegementSystemUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
-        // GET: Task
+
         public async Task<IActionResult> Index()
         {
               return _context.Tasks != null ? 
@@ -27,7 +33,7 @@ namespace TaskManegementSystem.Controllers
                           Problem("Entity set 'TaskManegementDbContext.Tasks'  is null.");
         }
 
-        // GET: Task/Details/5
+       
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Tasks == null)
@@ -44,16 +50,57 @@ namespace TaskManegementSystem.Controllers
 
             return View(taskViewModel);
         }
+        [Authorize]
+        [HttpGet]
+        public IActionResult CreateTask()
+        {
+            return View();
+        }
 
-        // GET: Task/Create
-        
 
-        // POST: Task/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateTask(TaskViewModel obj)
+        {
+
+            if (ModelState.IsValid)
+            {
+
+
+                _context.Tasks.Add(obj);
+                _context.SaveChanges();
+                return RedirectToAction("Success");
+            }
+
+            return View(obj);
+        }
+
+        public IActionResult Success()
+        {
+
+            return View();
+        }
+    
+        public IActionResult Create()
+        {
+            return View();
+        }
+
        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("TaskID,Name,Description,AssignedUser")] TaskViewModel taskViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(taskViewModel);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(taskViewModel);
+        }
 
-        // GET: Task/Edit/5
+       
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Tasks == null)
@@ -69,9 +116,7 @@ namespace TaskManegementSystem.Controllers
             return View(taskViewModel);
         }
 
-        // POST: Task/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TaskID,Name,Description,AssignedUser")] TaskViewModel taskViewModel)
@@ -104,7 +149,7 @@ namespace TaskManegementSystem.Controllers
             return View(taskViewModel);
         }
 
-        // GET: Task/Delete/5
+      
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Tasks == null)
@@ -122,7 +167,7 @@ namespace TaskManegementSystem.Controllers
             return View(taskViewModel);
         }
 
-        // POST: Task/Delete/5
+       
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -144,6 +189,56 @@ namespace TaskManegementSystem.Controllers
         private bool TaskViewModelExists(int id)
         {
           return (_context.Tasks?.Any(e => e.TaskID == id)).GetValueOrDefault();
+        }
+        [Authorize]
+        public async Task<IActionResult> AssignTaskAsync()
+        {
+
+            var tasks = _context.Tasks.Where(task => task.AssignedUser == null).ToList();
+
+            var users = await _userManager.Users.ToListAsync();
+
+            List<string> userNames = users.Select(user => user.FirstName).ToList();
+
+            ViewBag.UserNames = new SelectList(userNames);
+
+            return View(tasks);
+
+
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignTask(int taskId, string AssignedUser)
+        {
+            var task = await _context.Tasks.FindAsync(taskId);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            task.AssignedUser = AssignedUser;
+
+            try
+            {
+                _context.Update(task);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TaskViewModelExists(task.TaskID))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

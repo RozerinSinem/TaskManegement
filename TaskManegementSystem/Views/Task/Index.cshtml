@@ -5,12 +5,17 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<link rel="stylesheet" type="text/css" href="~/css/site.css" />
 
+<h1 class="text-center">All Tasks</h1>
 
-<table class="table">
+<div class="table-responsive">
+<table class="custom-table2">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TaskID)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
@@ -27,6 +32,9 @@
 @foreach (var item in Model) {
         <tr>
             <td>
+                @Html.DisplayFor(modelItem => item.TaskID)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
@@ -36,11 +44,12 @@
                 @Html.DisplayFor(modelItem => item.AssignedUser)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.TaskID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.TaskID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.TaskID">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.TaskID" class="btn btn-primary">Edit</a>
+                <a asp-action="Details" asp-route-id="@item.TaskID" class="btn btn-info">Details</a>
+                <a asp-action="Delete" asp-route-id="@item.TaskID" class="btn btn-danger">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+</div>
